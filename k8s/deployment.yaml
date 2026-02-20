@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jarvis
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jarvis
+  template:
+    metadata:
+      labels:
+        app: jarvis
+    spec:
+      containers:
+        - name: jarvis
+          image: jarvis-ai:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+

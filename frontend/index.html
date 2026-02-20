@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Jarvis AI</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.container{
+  width:400px;
+  background:#0b1220;
+  border-radius:15px;
+  padding:25px;
+  box-shadow:0 0 25px #00eaff;
+}
+
+h2{
+  text-align:center;
+  color:#00eaff;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  background:#00eaff;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#00c6d9;
+}
+
+#out{
+  margin-top:20px;
+  color:white;
+  min-height:60px;
+  background:#141b2d;
+  padding:10px;
+  border-radius:8px;
+}
+
+.loader{
+  text-align:center;
+  color:#00eaff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>🤖 Jarvis AI</h2>
+
+  <input id="msg" placeholder="Ask something...">
+
+  <button onclick="send()">Ask Jarvis</button>
+
+  <div id="out"></div>
+</div>
+
+<script>
+function send(){
+
+ const message = document.getElementById("msg").value;
+ document.getElementById("out").innerHTML =
+ "<div class='loader'>Thinking...</div>";
+
+ fetch("http://YOUR_BACKEND_IP/chat",{
+   method:"POST",
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({message:message})
+ })
+ .then(r=>r.json())
+ .then(d=>{
+   document.getElementById("out").innerText = d.response;
+ })
+ .catch(err=>{
+   document.getElementById("out").innerText = "Server not reachable";
+ });
+}
+</script>
+
+</body>
+</html>
+
