@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
         - name: jarvis
-          image: jarvis-ai:latest
-          imagePullPolicy: Never
+          image: sankettambe/jarvis-ai:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
-
