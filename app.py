@@ -4,10 +4,10 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# 1. Load variables from .env
+# Load variables from .env if running locally
 load_dotenv()
 
-# 2. Configure AI Model
+# Configure AI Model
 api_key = os.getenv("GOOGLE_API_KEY")
 if not api_key:
     print("CRITICAL ERROR: GOOGLE_API_KEY not found in environment!")
@@ -16,8 +16,7 @@ else:
 
 app = Flask(__name__)
 
-# 3. ENHANCED CORS setup
-# This tells the browser: "I allow GitHub Pages to talk to me."
+# ALLOW ALL ORIGINS: Essential for GitHub Pages -> Localhost communication
 CORS(app, resources={r"/*": {
     "origins": "*",
     "methods": ["GET", "POST", "OPTIONS"],
@@ -32,33 +31,28 @@ def home():
 
 @app.route("/chat", methods=["POST", "OPTIONS"])
 def chat():
-    # Handle the browser "handshake" (Pre-flight)
+    # Handle the 'pre-flight' handshake from the browser
     if request.method == "OPTIONS":
         return jsonify({"status": "ok"}), 200
 
+    user_data = request.get_json()
+    if not user_data:
+        return jsonify({"response": "Error: No data received"}), 400
+        
+    user_message = user_data.get("message")
+    if not user_message:
+        return jsonify({"response": "Error: No message provided"}), 400
+    
     try:
-        user_data = request.get_json()
-        if not user_data:
-            return jsonify({"response": "Error: No data received"}), 400
-            
-        user_message = user_data.get("message")
-        if not user_message:
-            return jsonify({"response": "Error: No message provided"}), 400
-        
-        # Generate response using Gemini
         response = model.generate_content(user_message)
-        
         if response and response.text:
             return jsonify({"response": response.text})
         else:
-            return jsonify({"response": "The AI could not generate a response."})
-
+            return jsonify({"response": "I'm processing, but couldn't generate a text response."})
     except Exception as e:
         print(f"AI Error: {str(e)}")
-        return jsonify({
-            "response": f"I'm sorry, I'm having trouble thinking. (Error: {str(e)})"
-        }), 500
+        return jsonify({"response": f"System Error: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    # 0.0.0.0 is critical for Kubernetes routing
+    # host 0.0.0.0 is required for Kubernetes port-forwarding
     app.run(host="0.0.0.0", port=8000)
