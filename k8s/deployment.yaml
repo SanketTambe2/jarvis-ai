@@ -15,6 +15,8 @@ spec:
       containers:
         - name: jarvis
           image: sankettambe/jarvis-ai:latest
-          imagePullPolicy: Always
           ports:
             - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: jarvis-secrets
