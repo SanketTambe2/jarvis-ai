@@ -9,5 +9,5 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["python","agent.py"]
+CMD ["python","app.py"]
 
