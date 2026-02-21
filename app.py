@@ -4,26 +4,26 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# Load variables from .env if running locally
+# 1. Load variables from .env
 load_dotenv()
 
-# Configure AI Model
+# 2. Configure Gemini
 api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    print("CRITICAL ERROR: GOOGLE_API_KEY not found in environment!")
-else:
+if api_key:
     genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-pro')
+else:
+    print("CRITICAL ERROR: GOOGLE_API_KEY not found!")
 
 app = Flask(__name__)
 
-# ALLOW ALL ORIGINS: Essential for GitHub Pages -> Localhost communication
+# 3. ULTIMATE CORS CONFIGURATION
+# This allows GitHub Pages (or any origin) to send POST requests with JSON headers
 CORS(app, resources={r"/*": {
     "origins": "*",
     "methods": ["GET", "POST", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
-}}) 
-
-model = genai.GenerativeModel('gemini-pro')
+}})
 
 @app.route("/", methods=["GET"])
 def home():
@@ -31,28 +31,29 @@ def home():
 
 @app.route("/chat", methods=["POST", "OPTIONS"])
 def chat():
-    # Handle the 'pre-flight' handshake from the browser
+    # Handle the browser's "handshake" check
     if request.method == "OPTIONS":
         return jsonify({"status": "ok"}), 200
 
-    user_data = request.get_json()
-    if not user_data:
-        return jsonify({"response": "Error: No data received"}), 400
-        
-    user_message = user_data.get("message")
-    if not user_message:
-        return jsonify({"response": "Error: No message provided"}), 400
-    
     try:
+        user_data = request.get_json()
+        if not user_data or "message" not in user_data:
+            return jsonify({"response": "Error: No message received"}), 400
+            
+        user_message = user_data.get("message")
+        
+        # Generate response using Gemini
         response = model.generate_content(user_message)
+        
         if response and response.text:
             return jsonify({"response": response.text})
         else:
-            return jsonify({"response": "I'm processing, but couldn't generate a text response."})
+            return jsonify({"response": "AI could not process this request."})
+
     except Exception as e:
-        print(f"AI Error: {str(e)}")
-        return jsonify({"response": f"System Error: {str(e)}"}), 500
+        print(f"Error: {str(e)}")
+        return jsonify({"response": f"Backend Error: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    # host 0.0.0.0 is required for Kubernetes port-forwarding
+    # host 0.0.0.0 is mandatory for Kubernetes/Docker
     app.run(host="0.0.0.0", port=8000)
