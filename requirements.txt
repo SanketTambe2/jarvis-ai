@@ -1,3 +1,7 @@
+flask
+flask-cors
+python-dotenv
+google-generativeai
 livekit-agents
 livekit-plugins-openai
 livekit-plugins-silero
@@ -5,7 +9,6 @@ livekit-plugins-google
 livekit-plugins-noise-cancellation
 langchain-community
 requests
-python-dotenv
 duckduckgo-search
 fuzzywuzzy
 python-Levenshtein
