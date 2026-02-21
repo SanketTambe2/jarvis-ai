@@ -1,185 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Jarvis AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis AI - Command Center</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            margin: 0; height: 100vh;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+        }
 
-<style>
-*{box-sizing:border-box;font-family:Segoe UI;}
-body{
- margin:0;height:100vh;
- background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
- display:flex;
-}
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0, 234, 255, 0.2);
+        }
+        .sidebar h2 { color: #00eaff; text-align: center; letter-spacing: 2px; text-shadow: 0 0 10px #00eaff; }
+        .newchat {
+            background: #00eaff; color: #000; border: none; padding: 12px; 
+            border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .newchat:hover { background: #00b8cc; box-shadow: 0 0 15px #00eaff; }
+        
+        .history { flex: 1; overflow-y: auto; margin-top: 20px; }
+        .history div {
+            padding: 10px; border-radius: 8px; margin-bottom: 8px;
+            background: rgba(27, 43, 58, 0.8); cursor: pointer; transition: 0.2s;
+        }
+        .history div:hover { background: #00eaff; color: black; }
 
-/* Sidebar */
-.sidebar{
- width:260px;
- background:rgba(0,0,0,.5);
- color:white;
- padding:15px;
- display:flex;
- flex-direction:column;
-}
-.sidebar h2{color:#00eaff;text-align:center;}
-.newchat{
- background:#00eaff;border:none;padding:10px;border-radius:10px;cursor:pointer;
-}
-.history{flex:1;overflow-y:auto;margin-top:10px;}
-.history div{
- padding:8px;
- border-radius:6px;
- margin-bottom:5px;
- background:#1b2b3a;
- cursor:pointer;
-}
-.footer{
- font-size:12px;
- text-align:center;
- margin-top:10px;
-}
-.footer a{
- color:#00eaff;
- text-decoration:none;
-}
+        .footer { font-size: 12px; text-align: center; margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; }
+        .footer a { color: #00eaff; text-decoration: none; }
 
-/* Main */
-.main{flex:1;display:flex;flex-direction:column;}
-.header{
- padding:12px;
- text-align:center;
- color:#00eaff;
- background:rgba(0,0,0,.4);
-}
+        /* Main Chat Area */
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .header {
+            padding: 15px; text-align: center; color: #00eaff;
+            background: rgba(0, 0, 0, 0.5); font-weight: bold; font-size: 1.2rem;
+            border-bottom: 1px solid rgba(0, 234, 255, 0.2);
+        }
 
-/* Chat */
-.chat{flex:1;padding:20px;overflow-y:auto;}
+        .chat { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
-.user,.ai{
- max-width:60%;
- padding:12px;
- margin-bottom:10px;
- border-radius:12px;
-}
-.user{background:#00eaff;color:black;margin-left:auto;}
-.ai{background:#1f2a40;color:white;}
+        /* Message Bubbles */
+        .user, .ai { max-width: 70%; padding: 14px; border-radius: 15px; line-height: 1.5; }
+        .user { background: #00eaff; color: black; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai { background: #1f2a40; color: white; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #00eaff; }
 
-.input{
- display:flex;gap:10px;padding:15px;background:rgba(0,0,0,.4);
-}
-input{
- flex:1;padding:10px;border-radius:8px;border:none;
-}
-button{padding:10px;border:none;border-radius:8px;cursor:pointer;}
-.send{background:#00eaff;}
-.mic{background:#ff004c;color:white;}
-</style>
+        /* Input Controls */
+        .input-area {
+            display: flex; gap: 12px; padding: 20px; background: rgba(0, 0, 0, 0.6);
+            border-top: 1px solid rgba(0, 234, 255, 0.2);
+        }
+        input {
+            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #444; 
+            background: #1b2b3a; color: white; outline: none;
+        }
+        input:focus { border-color: #00eaff; }
+        
+        button { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .send { background: #00eaff; color: black; }
+        .mic { background: #ff004c; color: white; }
+    </style>
 </head>
-
 <body>
 
 <div class="sidebar">
-<h2>🤖 Jarvis</h2>
-<button class="newchat" onclick="newChat()">➕ New Chat</button>
-
-<div id="history" class="history"></div>
-
-<div class="footer">
-Created by Sanket Tambe<br>
-<a href="https://sankettambe2.github.io/" target="_blank">📞 Contact</a>
-</div>
+    <h2>🤖 JARVIS</h2>
+    <button class="newchat" onclick="newChat()">+ NEW SESSION</button>
+    <div id="history" class="history"></div>
+    <div class="footer">
+        System Status: Online<br>
+        Developed by Sanket Tambe<br>
+        <a href="https://sankettambe2.github.io/" target="_blank">Contact Creator</a>
+    </div>
 </div>
 
 <div class="main">
-<div class="header">Jarvis AI</div>
-<div id="chat" class="chat"></div>
+    <div class="header">Neural Interface v3.0</div>
+    <div id="chat" class="chat"></div>
 
-<div class="input">
-<input id="msg" placeholder="Ask Jarvis...">
-<button class="mic" onclick="voice()">🎤</button>
-<button class="send" onclick="send()">Send</button>
-</div>
+    <div class="input-area">
+        <input id="msg" placeholder="Command Jarvis..." onkeypress="if(event.key==='Enter') send()">
+        <button class="mic" onclick="voice()">🎤</button>
+        <button class="send" onclick="send()">SEND</button>
+    </div>
 </div>
 
 <script>
-let chats = JSON.parse(localStorage.getItem("jarvisChats")) || [];
-let currentChat = chats.length;
+    let chats = JSON.parse(localStorage.getItem("jarvisChats")) || [[]];
+    let currentChat = chats.length - 1;
 
-const chatBox=document.getElementById("chat");
-const historyBox=document.getElementById("history");
+    const chatBox = document.getElementById("chat");
+    const historyBox = document.getElementById("history");
+    const msgInput = document.getElementById("msg");
 
-function save(){
- localStorage.setItem("jarvisChats",JSON.stringify(chats));
- renderHistory();
-}
+    function save() {
+        localStorage.setItem("jarvisChats", JSON.stringify(chats));
+        renderHistory();
+    }
 
-function renderHistory(){
- historyBox.innerHTML="";
- chats.forEach((c,i)=>{
-  let d=document.createElement("div");
-  d.innerText="Chat "+(i+1);
-  d.onclick=()=>loadChat(i);
-  historyBox.appendChild(d);
- });
-}
+    function renderHistory() {
+        historyBox.innerHTML = "";
+        chats.forEach((c, i) => {
+            let d = document.createElement("div");
+            d.innerText = "Log Session " + (i + 1);
+            d.onclick = () => loadChat(i);
+            historyBox.appendChild(d);
+        });
+    }
 
-function loadChat(i){
- currentChat=i;
- chatBox.innerHTML="";
- chats[i].forEach(m=>bubble(m.text,m.type));
-}
+    function loadChat(i) {
+        currentChat = i;
+        chatBox.innerHTML = "";
+        chats[i].forEach(m => bubble(m.text, m.type));
+    }
 
-function bubble(t,c){
- let d=document.createElement("div");
- d.className=c;
- d.innerText=t;
- chatBox.appendChild(d);
- chatBox.scrollTop=chatBox.scrollHeight;
-}
+    function bubble(t, c) {
+        let d = document.createElement("div");
+        d.className = c;
+        d.innerText = t;
+        chatBox.appendChild(d);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return d;
+    }
 
-function send(){
- let m=msg.value;
- if(!m)return;
- bubble(m,"user");
- msg.value="";
+    async function send() {
+        let m = msgInput.value.trim();
+        if (!m) return;
 
- chats[currentChat]=chats[currentChat]||[];
- chats[currentChat].push({text:m,type:"user"});
- save();
+        // User message
+        bubble(m, "user");
+        msgInput.value = "";
+        chats[currentChat].push({ text: m, type: "user" });
+        save();
 
- bubble("Thinking...","ai");
+        // AI "Thinking" state
+        let thinkingBubble = bubble("Analyzing data...", "ai");
 
- fetch("http://YOUR_BACKEND_IP:8000/chat",{
-  method:"POST",
-  headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({message:m})
- })
- .then(r=>r.json())
- .then(d=>{
-  chatBox.lastChild.innerText=d.response;
-  chats[currentChat].push({text:d.response,type:"ai"});
-  save();
- });
-}
+        try {
+            // IMPORTANT: Pointing to localhost:8000 for your Port-Forward tunnel
+            const response = await fetch("http://localhost:8000/chat", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: m })
+            });
 
-function newChat(){
- chats.push([]);
- currentChat=chats.length-1;
- chatBox.innerHTML="";
- save();
-}
+            const data = await response.json();
+            
+            if (data.response) {
+                thinkingBubble.innerText = data.response;
+                chats[currentChat].push({ text: data.response, type: "ai" });
+            } else {
+                thinkingBubble.innerText = "Error: System failed to generate response.";
+            }
+        } catch (error) {
+            thinkingBubble.innerText = "Offline: Please ensure 'kubectl port-forward' is running.";
+            console.error("Fetch error:", error);
+        }
+        save();
+    }
 
-function voice(){
- const r=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
- r.lang="en-US";
- r.start();
- r.onresult=e=>{
-  msg.value=e.results[0][0].transcript;
-  send();
- };
-}
+    function newChat() {
+        chats.push([]);
+        currentChat = chats.length - 1;
+        chatBox.innerHTML = "";
+        save();
+    }
 
-renderHistory();
+    function voice() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Voice recognition not supported in this browser.");
+            return;
+        }
+        const r = new SpeechRecognition();
+        r.lang = "en-US";
+        r.start();
+        r.onresult = e => {
+            msgInput.value = e.results[0][0].transcript;
+            send();
+        };
+    }
+
+    // Initial load
+    renderHistory();
+    loadChat(currentChat);
 </script>
 
 </body>
