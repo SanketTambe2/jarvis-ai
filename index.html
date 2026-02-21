@@ -137,18 +137,16 @@
         let m = msgInput.value.trim();
         if (!m) return;
 
-        // User message
         bubble(m, "user");
         msgInput.value = "";
         chats[currentChat].push({ text: m, type: "user" });
         save();
 
-        // AI "Thinking" state
         let thinkingBubble = bubble("Analyzing data...", "ai");
 
         try {
-            // IMPORTANT: Pointing to localhost:8000 for your Port-Forward tunnel
-            const response = await fetch("http://localhost:8000/chat", {
+            // Using 127.0.0.1 to avoid local name resolution issues
+            const response = await fetch("http://127.0.0.1:8000/chat", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: m })
@@ -163,7 +161,7 @@
                 thinkingBubble.innerText = "Error: System failed to generate response.";
             }
         } catch (error) {
-            thinkingBubble.innerText = "Offline: Please ensure 'kubectl port-forward' is running.";
+            thinkingBubble.innerText = "Offline: Please ensure 'kubectl port-forward' is running and browser allows 'Insecure Content'.";
             console.error("Fetch error:", error);
         }
         save();
@@ -191,7 +189,6 @@
         };
     }
 
-    // Initial load
     renderHistory();
     loadChat(currentChat);
 </script>
