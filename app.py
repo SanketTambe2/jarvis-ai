@@ -4,10 +4,10 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# Load variables from .env if running locally
+# 1. Load variables from .env if running on your laptop
 load_dotenv()
 
-# Configure AI Model
+# 2. Configure AI Model
 api_key = os.getenv("GOOGLE_API_KEY")
 if not api_key:
     print("CRITICAL ERROR: GOOGLE_API_KEY not found in environment!")
@@ -16,7 +16,7 @@ else:
 
 app = Flask(__name__)
 
-# CORS setup: allows your GitHub Pages frontend to talk to this backend
+# 3. CORS setup: This allows your GitHub Pages site to talk to your laptop
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 model = genai.GenerativeModel('gemini-pro')
@@ -41,12 +41,13 @@ def chat():
         return jsonify({"response": "Error: No message provided"}), 400
     
     try:
+        # Generate response using Gemini
         response = model.generate_content(user_message)
         return jsonify({"response": response.text})
     except Exception as e:
         print(f"AI Error: {str(e)}")
-        return jsonify({"response": f"I'm sorry, I'm having trouble thinking right now. (Error: {str(e)})"}), 500
+        return jsonify({"response": f"I'm sorry, I'm having trouble thinking. (Error: {str(e)})"}), 500
 
 if __name__ == "__main__":
-    # Port 8000 is used to match your Kubernetes port-forwarding
+    # Port 8000 matches your Kubernetes port-forwarding setup
     app.run(host="0.0.0.0", port=8000)
